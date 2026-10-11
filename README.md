@@ -1,6 +1,6 @@
 # Computer Science Course Projects
 
-本仓库收录本人在课程学习与编程实践中完成的项目，涵盖 C++ 桌面应用、Java Web 开发、Python Web 应用和 Python GUI 程序。
+本仓库包含本人在课程学习与编程实践中完成的项目，涵盖 C++ 桌面应用、Java Web 开发、Python Web 应用和 Python GUI 程序。
 
 ## 项目总览
 
@@ -27,8 +27,6 @@ computer-science-course-projects/
 
 ## 使用说明
 
-每个项目都包含独立的 `README.md`，说明其运行环境、依赖、配置和启动步骤。部分项目依赖本地数据库或第三方 API；请先阅读对应项目的说明文件，并使用自己的测试数据、数据库账号和 API Key。
+每个项目都包含独立的 `README.md`，说明其运行环境、依赖、配置和启动步骤。部分项目依赖本地数据库或第三方 API；可以先阅读对应项目的说明文件，并使用自己的测试数据、数据库账号和 API Key。
 
-## 说明
 
-本仓库仅提交源代码、文档和必要资源。IDE 缓存、编译产物、可执行文件、私密配置、数据库密码和 API Key 均通过 `.gitignore` 排除，不应提交到公开仓库。
