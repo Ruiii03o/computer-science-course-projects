@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}联系我们 - 我的网站{% endblock %}
+
+{% block content %}
+    <h2>联系我们</h2>
+    <!-- 表单：使用POST方法提交数据 -->
+    <form method="POST">
+        <div>
+            <label for="name">姓名：</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <br>
+        <div>
+            <label for="email">邮箱：</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <br>
+        <div>
+            <label for="message">留言：</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        <br>
+        <button type="submit">提交</button>
+
+        <p>设此联络栏</p>
+        <p>唯我独见空悬着</p>
+        <p>不知为何放</p>
+    </form>
+
+    <!-- 提交成功后显示提示 -->
+    {% if success %}
+        <p style="color: green; margin-top: 10px;">留言已提交，感谢您的反馈！</p>
+    {% endif %}
+{% endblock %}

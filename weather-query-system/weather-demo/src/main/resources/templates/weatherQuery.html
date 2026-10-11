@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>天气查询</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#f5f7fa;font-family:"微软雅黑";padding:20px;}
+        .container{width:1000px;margin:0 auto;}
+        .header{display:flex;gap:10px;margin-bottom:30px;}
+        .header input{flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;}
+        .header button{padding:10px 20px;background:#409eff;color:#fff;border:none;border-radius:6px;cursor:pointer;}
+        .weather-info{background:#fff;padding:20px;border-radius:8px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+        .analysis-box{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+        .analysis-box h3{color:#409eff;margin-bottom:10px;}
+        .analysis-box p{margin:8px 0;color:#333;line-height:1.6;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 style="text-align:center;margin-bottom:20px;color:#2c3e50;">天气查询</h1>
+
+    <form class="header" th:action="@{/searchWeather}" method="get">
+        <input type="text" name="city" placeholder="请输入城市名，如：广州" required>
+        <button type="submit">查询天气</button>
+    </form>
+
+    <div th:if="${weather != null}" class="weather-info">
+        <h2 th:text="${city}">城市名</h2>
+        <p>温度：<span th:text="${weather.temperature}">--</span>℃</p>
+        <p>天气：<span th:text="${weather.weather}">--</span></p>
+        <p>风向：<span th:text="${weather.windDir}">--</span> <span th:text="${weather.windPower}">--</span>级</p>
+        <p>湿度：<span th:text="${weather.humidity}">--</span>%</p>
+    </div>
+
+    <div th:if="${reportLine1 != null}" class="analysis-box">
+        <h3>📊 天气分析报告</h3>
+        <p th:text="${reportLine1}"></p>
+        <p th:text="${reportLine2}"></p>
+        <p th:text="${reportLine3}"></p>
+        <p th:text="${reportLine4}"></p>
+        <hr style="margin:15px 0;">
+        <p style="color:#3498db;">💡 温馨提示：<span th:text="${warmTip}"></span></p>
+        <p style="color:#27ae60;">🚶 出行建议：<span th:text="${travelAdvice}"></span></p>
+        <p style="color:#e74c3c;">👕 穿衣建议：<span th:text="${clothingAdvice}"></span></p>
+    </div>
+</div>
+</body>
+</html>

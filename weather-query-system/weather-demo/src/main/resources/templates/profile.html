@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 480px;
+        }
+        .card h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        .info {
+            font-size: 16px;
+            color: #34495e;
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+        .info span {
+            color: #409eff;
+            font-weight: bold;
+        }
+        .form-item {
+            margin: 25px 0;
+        }
+        .form-item label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+        }
+        .form-item input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        .form-item input:focus {
+            border-color: #409eff;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            background-color: #409eff;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 15px;
+        }
+        .btn:hover {
+            background-color: #3388dd;
+        }
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .btn-group a {
+            color: #409eff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid #409eff;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .btn-group a:hover {
+            background-color: #409eff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>个人中心</h2>
+    <p class="info">欢迎：<span th:text="${user.username}"></span></p>
+    <p class="info">当前常驻地：<span th:text="${user.defaultCity}"></span></p>
+
+    <form action="/updateCity" method="post" class="form-item">
+        <label>修改常驻地</label>
+        <input type="text" name="defaultCity" placeholder="输入城市名" required>
+        <button type="submit" class="btn" style="margin-top:12px;">保存</button>
+    </form>
+
+    <div class="btn-group">
+        <a href="/logout">退出登录</a>
+        <a href="/">返回首页</a>
+    </div>
+</div>
+</body>
+</html>

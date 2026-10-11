@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>好天气智慧平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        html {
+            background: #e4f0fc;
+        }
+
+        body {
+            background: #f5f7fa;
+            color: #2c3e50;
+            margin: 0;
+            border: 20px solid #c6e1ff;
+            min-height: 100vh;
+            border-radius: 0;
+        }
+
+        /* 顶部导航 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 80px;
+            position: relative;
+            z-index: 2;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 400;
+            color: #2c3e50;
+            font-family: "Georgia", serif;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+        .nav-buttons a {
+            display: inline-block;
+            margin-left: 15px;
+            padding: 8px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .nav-buttons .login-btn {
+            color: #2c3e50;
+        }
+        .nav-buttons .signup-btn {
+            background: #409eff;
+            color: #fff;
+        }
+        .nav-buttons .user-btn {
+            background: #409eff;
+            color: #fff;
+        }
+        .nav-buttons .logout-btn {
+            color: #2c3e50;
+        }
+
+        /* Banner区 - 背景图*/
+        .banner {
+            width: 95%;
+            max-width: 1300px;
+            margin: 0 auto;
+            border-radius: 16px;
+            padding: 120px 80px;
+            position: relative;
+            overflow: hidden;
+            background-image: url("/images/rainbow.jpg");
+
+            background-size: cover;
+            background-position: center;
+            image-rendering: crisp-edges;
+        }
+        .banner::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0);
+            border-radius: 16px;
+            z-index: 1;
+        }
+        .banner-content {
+            position: relative;
+            z-index: 2;
+        }
+        .banner-title {
+            font-size: 64px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .banner-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 2px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            margin-left: 180px;
+            margin-top: -10px;
+        }
+
+        /* 天气卡片 */
+        .weather-card {
+            width: 80%;
+            max-width: 800px;
+            margin: -40px auto 40px;
+            background: rgba(255, 255, 255, 0.70);
+            border: 1px solid rgba(64, 158, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+            padding: 30px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+            backdrop-filter: blur(8px);
+        }
+        .weather-card-title {
+            position: absolute;
+            top: 20px;
+            left: 28px;
+            font-size: 17px;
+            font-weight: 500;
+            color: #333639;
+            letter-spacing: 0.5px;
+        }
+        .weather-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-top: 25px;
+        }
+        .weather-icon {
+            font-size: 42px;
+        }
+        .weather-temp {
+            font-size: 54px;
+            font-weight: 600;
+            color: #40a0ff;
+        }
+        .weather-status {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-top: 5px;
+        }
+        .weather-right {
+            text-align: right;
+            font-size: 15px;
+            color: #5b6b79;
+            line-height: 1.7;
+            margin-top: 25px;
+        }
+        .weather-empty {
+            text-align: center;
+            width: 100%;
+            color: #7f8c8d;
+            padding: 20px 0;
+        }
+
+        /* 欢迎信息 */
+        .welcome-text {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: #2c3e50;
+        }
+
+        /* 功能按钮区 */
+        .category-section {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto 80px;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+        .category-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(64,158,255,0.12);
+        }
+        .category-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #409eff;
+        }
+        .category-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        /* 加载提示 */
+        .loading-container {
+            text-align: center;
+            margin-top: 40px;
+            display: none;
+        }
+        .loading-container.show {
+            display: block;
+        }
+        .loading-text {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(64,158,25,0.2);
+            border-top-color: #409eff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading-container" id="loadingContainer">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">数据加载中，请稍候...</div>
+</div>
+
+<!-- 顶部导航 -->
+<div class="header">
+    <div class="logo">---May every day have gentle wind and fine weather.---</div>
+    <div class="nav-buttons">
+        <div th:if="${loginUser == null}">
+            <a th:href="@{/login}" class="login-btn">登录</a>
+            <a th:href="@{/register}" class="signup-btn">注册</a>
+        </div>
+        <div th:if="${loginUser != null}">
+            <a th:href="@{/profile}" class="user-btn">个人中心</a>
+            <a th:href="@{/logout}" class="logout-btn">退出登录</a>
+        </div>
+    </div>
+</div>
+
+<!-- Banner区 -->
+<div class="banner">
+    <div class="banner-content">
+        <div class="banner-title">好天气</div>
+        <div class="banner-subtitle">—— 气象查询智慧平台</div>
+    </div>
+</div>
+
+<!-- 天气卡片区 -->
+<div th:if="${defaultWeather != null}" class="weather-card">
+    <div class="weather-card-title">个人常驻地实时天气</div>
+    <div class="weather-left">
+        <div class="weather-icon">🌤️</div>
+        <div>
+            <div class="weather-temp" th:text="${defaultWeather.temperature} + '℃'"></div>
+            <div class="weather-status" th:text="${defaultWeather.weather}"></div>
+        </div>
+    </div>
+    <div class="weather-right">
+        <div>城市：<span th:text="${defaultWeather.city}"></span></div>
+        <div>风向：<span th:text="${defaultWeather.winddirection}"></span></div>
+        <div>风力：<span th:text="${defaultWeather.windpower}"></span></div>
+        <div>湿度：<span th:text="${defaultWeather.humidity}"></span>%</div>
+        <div>更新：<span th:text="${defaultWeather.reporttime}"></span></div>
+    </div>
+</div>
+<div th:if="${defaultWeather == null}" class="weather-card">
+    <div class="weather-empty">
+        <h3>无法获取天气数据</h3>
+        <p>请检查网络或城市名称是否正确</p>
+    </div>
+</div>
+
+<!-- 欢迎信息 -->
+<div class="welcome-text">
+    <span th:if="${loginUser == null}">Hello,游客用户！</span>
+    <span th:if="${loginUser != null}">Hello,<span th:text="${loginUser.username}"></span>！</span>
+</div>
+
+<!-- 功能按钮区 -->
+<div class="category-section">
+    <div class="category-grid">
+        <a th:href="@{/toQuery}" class="category-card">
+            <div class="category-icon">🌡️</div>
+            <div class="category-title">天气查询</div>
+        </a>
+        <a th:href="@{/toChinaWeather}" class="category-card">
+            <div class="category-icon">🌏</div>
+            <div class="category-title">国内天气</div>
+        </a>
+        <a th:href="@{/toCompare}" class="category-card">
+            <div class="category-icon">⚖️</div>
+            <div class="category-title">城市对比</div>
+        </a>
+        <a th:href="@{/toRank}" class="category-card">
+            <div class="category-icon">📊</div>
+            <div class="category-title">天气排行</div>
+        </a>
+    </div>
+</div>
+
+<script>
+    const loadingContainer = document.getElementById("loadingContainer");
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            loadingContainer.classList.add("show");
+            const href = this.getAttribute('href');
+            setTimeout(() => {
+                window.location.href = href;
+            }, 800);
+            e.preventDefault();
+        });
+    });
+
+    window.addEventListener('pageshow', function() {
+        loadingContainer.classList.remove("show");
+    });
+</script>
+</body>
+</html>

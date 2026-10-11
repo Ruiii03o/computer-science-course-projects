@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 420px;
+        }
+        .card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        .form-item {
+            margin-bottom: 20px;
+        }
+        .form-item label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+        }
+        .form-item input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        .form-item input:focus {
+            border-color: #409eff;
+        }
+        .error {
+            color: #e74c3c;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #409eff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background-color: #3388dd;
+        }
+        .link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #409eff;
+            text-decoration: none;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>用户注册</h2>
+    <form action="/register" method="post">
+        <div class="form-item">
+            <label>用户名</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="form-item">
+            <label>密码</label>
+            <input type="password" name="password" required>
+        </div>
+        <div class="error" th:if="${error!=null}">
+            <p th:text="${error}"></p>
+        </div>
+        <button type="submit" class="btn-submit">注册</button>
+        <a href="/login" class="link">已有账号</a>
+    </form>
+</div>
+</body>
+</html>

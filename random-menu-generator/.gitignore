@@ -1,0 +1,18 @@
+# Python virtual environments and caches
+.venv/
+**/__pycache__/
+*.py[cod]
+
+# Local IDE settings
+.idea/
+*.iml
+
+# Packaging outputs
+Recipe/build/
+Recipe/dist/
+*.exe
+
+# Local configuration and user-generated messages
+Recipe/config.py
+Recipe/messages.txt
+Recipe/data/messages.txt

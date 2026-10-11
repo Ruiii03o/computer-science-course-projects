@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.name }} - 盲盒食谱{% endblock %}
+
+{% block content %}
+    <div style="max-width: 800px; margin: 0 auto;">
+        <h2>{{ recipe.name }}</h2>
+        
+        <!-- 食谱主图 -->
+        <div style="margin: 20px 0;">
+            <img src="{{ url_for('static', filename=recipe.image) }}"
+                 alt="{{ recipe.name }}"
+                 style="max-width: 100%; border-radius: 8px;">
+        </div>
+
+        <!-- 食谱视频（如果存在） -->
+        {% if recipe.video %}
+        <div style="margin: 20px 0;">
+            <h3>制作视频</h3>
+            <video controls style="max-width: 100%; border-radius: 8px;">
+                <source src="{{ url_for('static', filename=recipe.video) }}" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+        {% endif %}
+
+        <!-- 食谱详情 -->
+        <div class="recipe-content" style="line-height: 1.8;">
+            {{ recipe.detail|safe }}
+        </div>
+        
+        <br>
+        <!-- 返回首页按钮 -->
+        <a href="/" style="text-decoration: none;">
+            <button>返回首页</button>
+        </a>
+    </div>
+{% endblock %}

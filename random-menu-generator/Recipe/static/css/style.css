@@ -1,0 +1,326 @@
+/* 基础样式 */
+body {
+    /* 为固定导航栏预留空间，避免内容被遮挡 */
+    padding-top: 60px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    /* 确保页面可以滚动，测试导航效果 */
+    min-height: 2000px;
+}
+
+/* 头部区域样式 */
+.site-header {
+    position: relative;
+    overflow: visible;
+}
+
+/* 全屏banner容器 */
+.banner-container {
+    position: relative;
+    width: 100%;
+}
+
+/* 全屏banner图片 */
+.full-width-banner {
+    width: 100%;
+    height: 180px; /* 固定banner高度 */
+    object-fit: cover; /* 图片铺满容器，裁剪多余部分 */
+    display: block;
+}
+
+/* banner上的文字覆盖层 */
+.banner-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white; /* 白色文字，与图片形成对比 */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* 文字阴影，增强可读性 */
+}
+
+.banner-overlay h1 {
+    font-size: 42px;
+    margin: 0;
+    padding: 10px 20px;
+    background-color: rgba(0,0,0,0.3); /* 半透明背景，突出文字 */
+    border-radius: 8px;
+}
+
+/* 导航容器样式 - 使用fixed确保置顶 */
+.nav-container {
+    position: fixed; /* 固定定位，始终在视口顶部 */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999; /* 最高优先级，确保不被任何元素覆盖 */
+    background-color: white; /* 纯色背景，避免透视问题 */
+    border-bottom: 1px solid #ddd;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    height: 60px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-sizing: border-box; /* 确保padding不影响宽度 */
+}
+
+/* 导航链接样式 */
+nav {
+    width: 100%;
+    text-align: left;
+    font-family: "Microsoft Yahei", sans-serif;
+}
+
+nav a {
+    text-decoration: none;
+    color: #e74c3c;
+    margin: 0 15px;
+    font-weight: 500;
+    font-size: 16px;
+    transition: color 0.3s ease, transform 0.2s;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+nav a:hover {
+    color: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* 内容区域样式 */
+.content {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 20px; /* 与banner保持距离 */
+}
+
+/* 按钮样式 */
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .full-width-banner {
+        height: 140px; /* 与桌面端保持比例 */
+    }
+
+    .banner-overlay h1 {
+        font-size: 28px;
+    }
+
+    nav a {
+        margin: 0 8px;
+        font-size: 14px;
+    }
+
+    body {
+        padding-top: 50px; /* 移动端导航栏高度稍小 */
+    }
+
+    .nav-container {
+        height: 50px;
+    }
+}
+
+/* 筛选页面样式 */
+.filter-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-title {
+    text-align: center;
+    color: #333;
+    margin: 20px 0 30px;
+    font-size: 26px;
+}
+
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+/* 筛选选项区域 */
+.filter-options {
+    flex: 1;
+    min-width: 300px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.filter-group {
+    margin-bottom: 25px;
+}
+
+.filter-group h3 {
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 18px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #444;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.checkbox-group label:hover {
+    background-color: #f5f5f5;
+}
+
+.checkbox-group input {
+    margin-right: 6px;
+}
+
+/* 按钮样式 */
+.filter-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+}
+
+.filter-btn:hover {
+    background-color: #2980b9;
+}
+
+.reset-btn {
+    background-color: #f1f1f1;
+    color: #555;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.reset-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* 筛选结果区域 */
+.filter-results {
+    flex: 2;
+    min-width: 300px;
+}
+
+.filter-results h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.recipe-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.recipe-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.recipe-card h4 {
+    padding: 15px 15px 5px;
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.recipe-meta {
+    padding: 0 15px 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.recipe-meta span {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.view-recipe {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    background-color: #f8f9fa;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.view-recipe:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.no-results {
+    text-align: center;
+    color: #888;
+    padding: 40px 0;
+    background: white;
+    border-radius: 8px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .filter-container {
+        flex-direction: column;
+    }
+
+    .recipes-grid {
+        grid-template-columns: 1fr;
+    }
+}

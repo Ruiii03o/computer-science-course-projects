@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>全国城市温度排行</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family: "微软雅黑";}
+        body{background:#f5f7fa;padding:20px;}
+        .container{max-width:1600px;margin:0 auto;}
+        h1{text-align:center;margin-bottom:24px;color:#333;}
+        .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+        .card{background:white;border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
+        .card h2{font-size:18px;margin-bottom:12px;padding-left:8px;border-left:4px solid #409eff;}
+        table{width:100%;border-collapse:collapse;}
+        th,td{padding:10px;text-align:center;border:1px solid #eee;}
+        th{background:#409eff;color:white;}
+        .empty{text-align:center;padding:30px;color:#999;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🌍 全国城市温度实时排行</h1>
+
+    <div class="grid">
+        <!-- 最热 -->
+        <div class="card">
+            <h2>🔥 温度最高</h2>
+            <table th:if="${highList != null and not highList.isEmpty()}">
+                <tr><th>排名</th><th>城市</th><th>温度</th><th>天气</th></tr>
+                <tr th:each="d, s : ${highList}">
+                    <td th:text="${s.index+1}"></td>
+                    <td th:text="${d.cityName}"></td>
+                    <td th:text="${d.temperature + '℃'}"></td>
+                    <td th:text="${d.weatherDesc}"></td>
+                </tr>
+            </table>
+            <div class="empty" th:if="${highList == null or highList.isEmpty()}">暂无数据</div>
+        </div>
+
+        <!-- 最冷 -->
+        <div class="card">
+            <h2>❄️ 温度最低</h2>
+            <table th:if="${lowList != null and not lowList.isEmpty()}">
+                <tr><th>排名</th><th>城市</th><th>温度</th><th>天气</th></tr>
+                <tr th:each="d, s : ${lowList}">
+                    <td th:text="${s.index+1}"></td>
+                    <td th:text="${d.cityName}"></td>
+                    <td th:text="${d.temperature + '℃'}"></td>
+                    <td th:text="${d.weatherDesc}"></td>
+                </tr>
+            </table>
+            <div class="empty" th:if="${lowList == null or lowList.isEmpty()}">暂无数据</div>
+        </div>
+
+        <!-- 极端天气 -->
+        <div class="card">
+            <h2>⚠️ 极端天气</h2>
+            <table th:if="${extremeList != null and not extremeList.isEmpty()}">
+                <tr><th>城市</th><th>温度</th><th>天气</th></tr>
+                <tr th:each="d : ${extremeList}">
+                    <td th:text="${d.cityName}"></td>
+                    <td th:text="${d.temperature + '℃'}"></td>
+                    <td th:text="${d.weatherDesc}"></td>
+                </tr>
+            </table>
+            <div class="empty" th:if="${extremeList == null or extremeList.isEmpty()}">暂无极端天气</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

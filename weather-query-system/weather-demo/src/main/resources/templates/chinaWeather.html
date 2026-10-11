@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>国内天气总览</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#1a202c;font-family:"微软雅黑";padding:20px;color:#fff;}
+        .container{width:1400px;margin:0 auto;}
+        .title{text-align:center;color:#fff;font-size:28px;margin-bottom:20px;}
+        .grid-box{display:grid;grid-template-columns:2fr 1fr;gap:20px;}
+        .map-box{background:#2d3748;padding:20px;border-radius:8px;height:600px;}
+        .pie-box{background:#2d3748;padding:20px;border-radius:8px;height:300px;}
+        .list-box{background:#2d3748;padding:20px;border-radius:8px;margin-top:20px;}
+        table{width:100%;border-collapse:collapse;}
+        th,td{border:1px solid #4a5568;padding:10px;text-align:center;}
+        th{background:#4a5568;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="title">国内天气数据分析平台</h1>
+    <div class="grid-box">
+        <div class="map-box" id="chinaMap"></div>
+        <div>
+            <div class="pie-box" id="pieChart"></div>
+        </div>
+    </div>
+
+    <!-- 下方省会天气列表 -->
+    <div class="list-box">
+        <h2>全国市县天气列表</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>城市</th>
+                <th>温度(℃)</th>
+                <th>天气状况</th>
+                <th>湿度</th>
+                <th>风向风力</th>
+                <th>天气类型</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="city : ${cityList}">
+                <td th:text="${city.cityName}"></td>
+                <td th:text="${city.tempNum}"></td>
+                <td th:text="${city.weatherDesc}"></td>
+                <td th:text="${city.humidity}"></td>
+                <td th:text="${city.windInfo}"></td>
+                <td th:text="${city.weatherTagName}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var mapData = /*[[${mapData}]]*/ [];
+    var pieData = /*[[${pieData}]]*/ [0,0,0,0,0,0,0,0];
+
+    // 1. 中国地图（按气温高低着色）
+    var mapDom = document.getElementById('chinaMap');
+    var myMap = echarts.init(mapDom);
+    myMap.setOption({
+        title: {text: '中国市县气温分布', left: 'center', textStyle: {color: '#fff'}},
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                return params.name + '<br/>温度: ' + params.value + '℃';
+            }
+        },
+        visualMap: {
+            min: -10,
+            max: 40,
+            left: 'left',
+            top: 'bottom',
+            text: ['高温', '低温'],
+            calculable: true,
+            inRange: {
+                color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+            }
+        },
+        series: [{
+            name: '温度',
+            type: 'map',
+            map: 'china',
+            roam: true,
+            zoom: 1.2,
+            data: mapData
+        }]
+    });
+
+    // 2. 环形饼图（按天气类型 → 雨天、雪天、晴天、多云、阴天、雾霾、高温、其他）
+    var pieDom = document.getElementById('pieChart');
+    var myPie = echarts.init(pieDom);
+    myPie.setOption({
+        title: {text: '全国天气类型占比', left: 'center', textStyle: {color: '#fff'}},
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                var name = params.name;
+                var count = params.value;
+                var percent = params.percent.toFixed(2);
+                return name + '<br/>数量: ' + count + '个 (' + percent + '%)';
+            }
+        },
+        series: [{
+            type: 'pie',
+            radius: ['40%', '70%'],
+            data: [
+                {value: pieData[0], name: '雨天', itemStyle: {color: '#4E8ACB'}},
+                {value: pieData[1], name: '雪天', itemStyle: {color: '#9CD6F0'}},
+                {value: pieData[2], name: '晴天', itemStyle: {color: '#FFD966'}},
+                {value: pieData[3], name: '多云', itemStyle: {color: '#B7B7B7'}},
+                {value: pieData[4], name: '阴天', itemStyle: {color: '#8899A6'}},
+                {value: pieData[5], name: '雾霾天', itemStyle: {color: '#A498B2'}},
+                {value: pieData[6], name: '高温天气', itemStyle: {color: '#F76666'}},
+                {value: pieData[7], name: '其他天气', itemStyle: {color: '#66BB6A'}}
+            ],
+            label: {color: '#fff'}
+        }]
+    });
+</script>
+</body>
+</html>

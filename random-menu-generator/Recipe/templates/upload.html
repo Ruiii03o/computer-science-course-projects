@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传你的独家食谱</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+        body {
+            background-color: #f9fafb;
+            padding: 40px 0;
+        }
+
+        /* 容器样式 */
+        .upload-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .upload-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+        }
+
+        /* 标题样式 */
+        .page-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #FFC107;
+        }
+        .page-title::before {
+            content: "🥬";
+            margin-right: 10px;
+        }
+
+        /* 表单组样式（核心：标签在上，输入框在下） */
+        .form-group {
+            margin-bottom: 28px;
+        }
+        .form-label {
+            display: block; /* 强制标签独占一行 */
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .required {
+            color: #dc3545;
+        }
+
+        /* 输入框样式 */
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.3s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #FFC107;
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        }
+        .form-textarea {
+            height: 140px;
+            resize: vertical;
+        }
+
+        /* 文件上传样式 */
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-btn {
+            padding: 12px 24px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            color: #555;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .file-btn:hover {
+            background: #eee;
+        }
+        .file-input {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-name {
+            margin-left: 12px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 提示文字和错误提示 */
+        .hint-text {
+            margin-top: 6px;
+            font-size: 13px;
+            color: #888;
+        }
+        .error-alert {
+            background-color: #fff5f5;
+            border-left: 4px solid #dc3545;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            color: #dc3545;
+            font-size: 14px;
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #FFC107 0%, #FFA000 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #FFB300 0%, #FF8F00 100%);
+            transform: translateY(-2px);
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 576px) {
+            .upload-card {
+                padding: 25px 20px;
+            }
+            .page-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <div class="upload-card">
+            <h1 class="page-title">上传你的独家食谱</h1>
+
+            <!-- 错误提示（如果后端返回error参数则显示） -->
+            {% if error %}
+                <div class="error-alert">{{ error }}</div>
+            {% endif %}
+
+            <!-- 上传表单 -->
+            <form method="POST" action="/upload" enctype="multipart/form-data">
+                <!-- 菜谱名称 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        菜谱名称 <span class="required">*</span>
+                    </label>
+                    <input type="text" name="name" class="form-input" placeholder="例如：番茄鸡蛋面" required>
+                    <p class="hint-text">请填写清晰的名称，方便他人快速识别</p>
+                </div>
+
+                <!-- 菜谱标签 -->
+                <div class="form-group">
+                    <label class="form-label">菜谱标签</label>
+                    <input type="text" name="tags" class="form-input" placeholder="例如：家常菜,快手菜,素食（多个标签用逗号分隔）">
+                    <p class="hint-text">标签有助于分类，让更多人找到你的食谱</p>
+                </div>
+
+                <!-- 食材列表 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        食材列表 <span class="required">*</span>
+                    </label>
+                    <input type="text" name="ingredients" class="form-input" placeholder="例如：番茄2个,鸡蛋3个,面条150g" required>
+                    <p class="hint-text">注明食材和大致用量，避免他人准备时遗漏</p>
+                </div>
+
+                <!-- 烹饪器械 -->
+                <div class="form-group">
+                    <label class="form-label">烹饪器械</label>
+                    <input type="text" name="equipment" class="form-input" placeholder="例如：炒锅,煮锅,烤箱（多个器械用逗号分隔）">
+                    <p class="hint-text">提前说明需要的厨具，提升用户体验</p>
+                </div>
+
+                <!-- 烹饪步骤 -->
+                <div class="form-group">
+                    <label class="form-label">
+                        烹饪步骤 <span class="required">*</span>
+                    </label>
+                    <textarea name="steps" class="form-textarea" placeholder="请按顺序填写步骤，每行一个（例如：1. 番茄切块；2. 鸡蛋打散炒熟）" required></textarea>
+                    <p class="hint-text">步骤清晰易懂，新手也能轻松跟着做</p>
+                </div>
+
+                <!-- 菜谱图片 -->
+                <div class="form-group">
+                    <label class="form-label">菜谱图片</label>
+                    <div>
+                        <label class="file-upload">
+                            <span class="file-btn">选择图片</span>
+                            <input type="file" name="image" class="file-input" accept="image/*" onchange="showFileName(this, 'imageName')">
+                        </label>
+                        <span id="imageName" class="file-name">未选择文件</span>
+                    </div>
+                    <p class="hint-text">支持 png、jpg、jpeg、gif，建议上传清晰的成品图</p>
+                </div>
+
+                <!-- 菜谱视频 -->
+                <div class="form-group">
+                    <label class="form-label">菜谱视频</label>
+                    <div>
+                        <label class="file-upload">
+                            <span class="file-btn">选择视频</span>
+                            <input type="file" name="video" class="file-input" accept="video/*" onchange="showFileName(this, 'videoName')">
+                        </label>
+                        <span id="videoName" class="file-name">未选择文件</span>
+                    </div>
+                    <p class="hint-text">支持 mp4、mov、avi，可选上传烹饪过程视频</p>
+                </div>
+
+                <!-- 提交按钮 -->
+                <button type="submit" class="submit-btn">提交我的食谱</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 显示文件名的JS -->
+    <script>
+        function showFileName(input, targetId) {
+            const fileNameElement = document.getElementById(targetId);
+            if (input.files && input.files[0]) {
+                let fileName = input.files[0].name;
+                if (fileName.length > 25) {
+                    fileName = fileName.substring(0, 22) + "...";
+                }
+                fileNameElement.textContent = fileName;
+                fileNameElement.style.color = "#FFA000";
+            } else {
+                fileNameElement.textContent = "未选择文件";
+                fileNameElement.style.color = "#888";
+            }
+        }
+    </script>
+</body>
+</html>

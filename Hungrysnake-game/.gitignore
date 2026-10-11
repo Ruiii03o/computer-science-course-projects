@@ -1,0 +1,22 @@
+# Visual Studio local state
+.vs/
+*.suo
+*.user
+*.vcxproj.user
+*.VC.db
+
+# C++ build outputs
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.idb
+*.ipch
+*.tlog
+*.log
+*.recipe
+*.FileListAbsolute.txt

@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}随机抽取 - 盲盒食谱{% endblock %}
+
+{% block content %}
+<div class="random-page-container">
+    <h2 class="page-title"><随机抽取></随机抽取></h2>
+
+    <!-- 随机抽取模块卡片 -->
+    <div class="random-card">
+        <!-- 1. 想要的属性标签区 -->
+        <div class="tag-section">
+            <h3 class="section-title">想要的属性</h3>
+            <div class="tags include-tags">
+                <span class="tag" data-type="include">鸡肉</span>
+                <span class="tag" data-type="include">家常菜</span>
+                <span class="tag" data-type="include">川菜</span>
+                <span class="tag" data-type="include">粤菜</span>
+                <span class="tag" data-type="include">减脂餐</span>
+                <span class="tag" data-type="include">甜品</span>
+                <span class="tag" data-type="include">西餐</span>
+                <span class="tag" data-type="include">中餐</span>
+            </div>
+        </div>
+
+        <!-- 2. 不想要的属性标签区 -->
+        <div class="tag-section">
+            <h3 class="section-title exclude-title">不想要的属性</h3>
+            <div class="tags exclude-tags">
+                <span class="tag" data-type="exclude">辣</span>
+                <span class="tag" data-type="exclude">油炸</span>
+                <span class="tag" data-type="exclude">耗时</span>
+                <span class="tag" data-type="exclude">海鲜</span>
+                <span class="tag" data-type="exclude">生食</span>
+                <span class="tag" data-type="exclude">高糖</span>
+            </div>
+        </div>
+
+        <!-- 3. 已选择属性汇总区 -->
+        <div class="selected-tags-summary">
+            <div class="selected-group include-group">
+                <span class="summary-label">已选想要：</span>
+                <span id="selected-include" class="selected-values">暂无</span>
+            </div>
+            <div class="selected-group exclude-group">
+                <span class="summary-label">已排除：</span>
+                <span id="selected-exclude" class="selected-values">暂无</span>
+            </div>
+        </div>
+
+        <!-- 4. 随机抽取按钮和结果区域 -->
+        <div class="action-and-result">
+            <button id="randomBtn" class="random-btn">
+                随机抽取食谱
+                <i class="fas fa-random ml-2"></i>
+            </button>
+
+            <div id="result" class="result-card">
+                <h4 class="result-title">恭喜抽到：</h4>
+                <div class="recipe-preview">
+                    <img id="recipeImage" src="" alt="食谱图片" class="recipe-image">
+                    <div class="recipe-info">
+                        <p id="recipeName" class="recipe-name"></p>
+                        <p id="recipeTags" class="recipe-tags"></p>
+                        <a id="recipeLink" href="" class="view-details">查看详情 →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript交互逻辑 -->
+<script>
+    // 初始化数据和状态
+    const allRecipes = {{ all_recipes|tojson }};
+    const selected = {
+        include: new Set(),
+        exclude: new Set()
+    };
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        initTagEvents();
+    });
+
+    // 初始化标签点击事件
+    function initTagEvents() {
+        document.querySelectorAll('.tag').forEach(tag => {
+            // 存储原始样式
+            tag.dataset.originalBg = getComputedStyle(tag).backgroundColor;
+            tag.dataset.originalColor = getComputedStyle(tag).color;
+
+            tag.addEventListener('click', () => handleTagClick(tag));
+        });
+    }
+
+    // 处理标签点击
+    function handleTagClick(tag) {
+        const type = tag.dataset.type;
+        const tagText = tag.textContent;
+
+        if (selected[type].has(tagText)) {
+            // 取消选择
+            selected[type].delete(tagText);
+            resetTagStyle(tag);
+        } else {
+            // 选中
+            selected[type].add(tagText);
+            highlightTag(tag, type);
+        }
+
+        // 更新已选属性显示
+        updateSelectedTags();
+    }
+
+    // 高亮选中的标签
+    function highlightTag(tag, type) {
+        if (type === 'include') {
+            tag.style.backgroundColor = '#2ecc71';
+            tag.style.color = 'white';
+        } else {
+            tag.style.backgroundColor = '#e74c3c';
+            tag.style.color = 'white';
+        }
+        tag.style.transform = 'scale(1.05)';
+    }
+
+    // 重置标签样式
+    function resetTagStyle(tag) {
+        tag.style.backgroundColor = tag.dataset.originalBg;
+        tag.style.color = tag.dataset.originalColor;
+        tag.style.transform = 'scale(1)';
+    }
+
+    // 更新已选属性汇总
+    function updateSelectedTags() {
+        const includeText = Array.from(selected.include).join('、') || '暂无';
+        document.getElementById('selected-include').textContent = includeText;
+
+        const excludeText = Array.from(selected.exclude).join('、') || '暂无';
+        document.getElementById('selected-exclude').textContent = excludeText;
+    }
+
+    // 随机抽取逻辑
+    document.getElementById('randomBtn').addEventListener('click', () => {
+        // 添加按钮点击动画
+        const btn = document.getElementById('randomBtn');
+        btn.classList.add('btn-loading');
+
+        // 筛选食谱
+        setTimeout(() => { // 模拟加载延迟，提升体验
+            let filteredRecipes = [...allRecipes];
+
+            // 应用"想要"的筛选条件
+            if (selected.include.size > 0) {
+                filteredRecipes = filteredRecipes.filter(recipe =>
+                    Array.from(selected.include).every(needTag =>
+                        recipe.tags.includes(needTag)
+                    )
+                );
+            }
+
+            // 应用"排除"的筛选条件
+            if (selected.exclude.size > 0) {
+                filteredRecipes = filteredRecipes.filter(recipe =>
+                    !Array.from(selected.exclude).some(badTag =>
+                        recipe.tags.includes(badTag)
+                    )
+                );
+            }
+
+            // 处理无结果情况
+            if (filteredRecipes.length === 0) {
+                showNotification('没有找到完全符合条件的食谱，将从所有食谱中抽取～');
+                filteredRecipes = [...allRecipes];
+            }
+
+            // 随机选择食谱并展示
+            const randomRecipe = filteredRecipes[Math.floor(Math.random() * filteredRecipes.length)];
+            displayRecipeResult(randomRecipe);
+
+            // 移除按钮动画
+            btn.classList.remove('btn-loading');
+        }, 600);
+    });
+
+    // 显示食谱结果
+    function displayRecipeResult(recipe) {
+        const resultDiv = document.getElementById('result');
+        const staticUrl = "{{ url_for('static', filename='') }}";
+
+        // 更新结果内容
+        document.getElementById('recipeImage').src = staticUrl + recipe.image;
+        document.getElementById('recipeName').textContent = recipe.name;
+        document.getElementById('recipeTags').textContent = `标签：${recipe.tags.join('、')}`;
+        document.getElementById('recipeLink').href = `/recipe/${recipe.id}`;
+
+        // 显示结果并添加动画
+        resultDiv.style.display = 'block';
+        resultDiv.style.opacity = '0';
+        resultDiv.style.transform = 'translateY(20px)';
+
+        setTimeout(() => {
+            resultDiv.style.opacity = '1';
+            resultDiv.style.transform = 'translateY(0)';
+        }, 50);
+    }
+
+    // 显示通知提示
+    function showNotification(message) {
+        // 创建通知元素
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        // 显示通知
+        setTimeout(() => {
+            notification.style.opacity = '1';
+        }, 10);
+
+        // 3秒后隐藏通知
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+</script>
+
+<style>
+    /* 基础样式 */
+    .random-page-container {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        margin: 30px 0 40px;
+        color: #333;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    /* 卡片容器 */
+    .random-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        margin-bottom: 40px;
+    }
+
+    /* 标签区域 */
+    .tag-section {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title::before {
+        content: "•";
+        margin-right: 8px;
+        color: #3498db;
+    }
+
+    .exclude-title::before {
+        color: #e74c3c;
+    }
+
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tag {
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        user-select: none;
+    }
+
+    .include-tags .tag {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .exclude-tags .tag {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+
+    .tag:hover {
+        transform: scale(1.05);
+    }
+
+    /* 已选属性汇总 */
+    .selected-tags-summary {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 30px;
+        border-left: 4px solid #3498db;
+    }
+
+    .selected-group {
+        margin-bottom: 10px;
+    }
+
+    .summary-label {
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    .include-group .summary-label {
+        color: #2ecc71;
+    }
+
+    .exclude-group .summary-label {
+        color: #e74c3c;
+    }
+
+    .selected-values {
+        color: #555;
+        line-height: 1.6;
+    }
+
+    /* 按钮和结果区域 */
+    .action-and-result {
+        text-align: center;
+    }
+
+    .random-btn {
+        padding: 14px 32px;
+        font-size: 18px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 30px;
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+    }
+
+    .random-btn:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-loading {
+        background-color: #90caf9;
+        transform: scale(0.98);
+    }
+
+    .result-card {
+        display: none;
+        margin-top: 20px;
+        padding: 25px;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .result-title {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 20px;
+    }
+
+    .recipe-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .recipe-image {
+        max-width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .recipe-info {
+        text-align: left;
+        max-width: 400px;
+    }
+
+    .recipe-name {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 15px 0;
+        color: #222;
+    }
+
+    .recipe-tags {
+        color: #666;
+        margin: 0 0 15px 0;
+        font-size: 14px;
+    }
+
+    .view-details {
+        display: inline-block;
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .view-details:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+
+    /* 通知提示样式 */
+    .notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 4px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 9999;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 600px) {
+        .random-card {
+            padding: 20px 15px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            margin: 20px 0 30px;
+        }
+
+        .random-btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+        }
+
+        .recipe-image {
+            height: 180px;
+        }
+    }
+</style>
+{% endblock %}

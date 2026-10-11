@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 菜谱生成器</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f7f8fa;
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 60px;
+            /* 为固定导航栏预留空间，避免内容被遮挡 */
+            padding-top: 60px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            /* 确保页面可以滚动，测试导航效果 */
+            min-height: 2000px;
+        }
+
+        /* 页面容器 */
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* 顶部导航栏 */
+        .site-header {
+             position: relative;
+             overflow: visible;
+        }
+        .banner-container {
+             position: relative;
+             width: 100%;
+        }
+
+              /* 全屏banner图片 */
+        .full-width-banner {
+             width: 100%;
+             height: 180px; /* 固定banner高度 */
+             object-fit: cover; /* 图片铺满容器，裁剪多余部分 */
+             display: block;
+        }
+
+        /* banner上的文字覆盖层 */
+        .banner-overlay {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              text-align: center;
+              color: white; /* 白色文字，与图片形成对比 */
+              text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* 文字阴影，增强可读性 */
+        }
+
+        .banner-overlay h1 {
+                  font-size: 42px;
+                  margin: 0;
+                  padding: 10px 20px;
+                  background-color: rgba(0,0,0,0.3); /* 半透明背景，突出文字 */
+                  border-radius: 8px;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* 网站Logo区域 */
+        .logo-container {
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* 导航菜单 */
+        .nav-container {
+            position: fixed; /* 固定定位，始终在视口顶部 */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999; /* 最高优先级，确保不被任何元素覆盖 */
+            background-color: white; /* 纯色背景，避免透视问题 */
+            border-bottom: 1px solid #ddd;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            height: 60px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-sizing: border-box; /* 确保padding不影响宽度 */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: #333;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a {
+               text-decoration: none;
+               color: #e74c3c;
+               margin: 0 15px;
+               font-weight: 500;
+               font-size: 16px;
+               transition: color 0.3s ease, transform 0.2s;
+               text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a:hover {
+             color: #c0392b;
+             transform: translateY(-2px);
+        }
+
+        .nav-link:hover {
+            color: #0078d4;
+        }
+
+        .nav-link.active {
+            color: #0078d4;
+            position: relative;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #0078d4;
+            border-radius: 1px;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        /* 标题区域 */
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .page-subtitle {
+            font-size: 15px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* 对话区域 */
+        .chat-container {
+            margin-bottom: 30px;
+        }
+
+        /* 系统提示 */
+        .system-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .system-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background-color: #e5f3ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .system-content {
+            background-color: #e5f3ff;
+            color: #1d4ed8;
+            padding: 12px 16px;
+            border-radius: 0 10px 10px 10px;
+            max-width: 85%;
+            font-size: 14px;
+        }
+
+        /* 用户消息 */
+        .user-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            justify-content: flex-end;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-content {
+            background-color: #0078d4;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 10px 0 10px 10px;
+            max-width: 85%;
+            font-size: 15px;
+        }
+
+        /* AI消息 */
+        .ai-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .ai-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background-color: #f0f7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .ai-content {
+            background-color: white;
+            border: 1px solid #eee;
+            padding: 16px;
+            border-radius: 0 10px 10px 10px;
+            max-width: 85%;
+            font-size: 15px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .recipe-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 16px 0 8px;
+            color: #1a1a1a;
+        }
+
+        .recipe-title:first-child {
+            margin-top: 0;
+        }
+
+        /* AI操作按钮 */
+        .ai-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #f5f5f5;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background-color: #f7f8fa;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #f0f0f0;
+            border-color: #ddd;
+        }
+
+        .icon {
+            font-size: 14px;
+        }
+
+        /* 输入区域 */
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-top: 1px solid #eee;
+            padding: 12px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+        }
+
+        .input-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 8px;
+            position: relative;
+        }
+
+        .prompt-input {
+            flex-grow: 1;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .prompt-input:focus {
+            border-color: #0078d4;
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            background-color: #005a9e;
+        }
+
+        .send-icon {
+            font-size: 16px;
+        }
+
+        /* 输入提示 */
+        .input-hints {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+            padding-left: 16px;
+        }
+
+        .hint-item {
+            font-size: 13px;
+            color: #888;
+        }
+
+        /* 错误提示 */
+        .error-notice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: #fff8f8;
+            border: 1px solid #ffebeb;
+            border-radius: 8px;
+            color: #d93025;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .error-icon {
+            font-size: 16px;
+        }
+
+        /* 复制成功提示 */
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #34a853;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .copy-success.show {
+            opacity: 1;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .ai-content, .user-content {
+                max-width: 80%;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            .nav-links {
+                gap: 16px;
+                overflow-x: auto;
+                padding-bottom: 8px;
+            }
+
+            .nav-link {
+                font-size: 14px;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 网站头部导航 -->
+    <header class="site-header">
+        <div class="header-content">
+
+
+            <!-- 导航菜单 -->
+             <div class="nav-container">
+               <nav>
+                <a href="/">首页</a>
+                <a href="/random">随机抽取</a>
+                <a href="/filter">食材筛选</a>
+                <a href="/generate">食谱生成</a>
+                <a href="/about">关于我们</a>
+                <a href="/contact">联系我们</a>
+               </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <h1 class="page-title">智能菜谱生成</h1>
+            <p class="page-subtitle">输入食材、口味或烹饪要求，获取专属菜谱</p>
+
+            <!-- 对话区域 -->
+            <div class="chat-container">
+                <!-- 系统提示 -->
+                <div class="system-message">
+                    <div class="system-avatar">📋</div>
+                    <div class="system-content">
+                        你可以输入食材、口味或烹饪要求（例如"用鸡肉做一道辣菜"、"30分钟快手晚餐"），我会为你生成详细菜谱
+                    </div>
+                </div>
+
+                {% if keyword and recipe %}
+                <!-- 用户输入 -->
+                <div class="user-message">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-content">{{ keyword }}</div>
+                </div>
+
+                <!-- AI回复 -->
+                <div class="ai-message">
+                    <div class="ai-avatar">🤖</div>
+                    <div class="ai-content">
+                        {{ recipe|replace('# ', '<h4 class="recipe-title">')|replace('\n# ', '</h4><h4 class="recipe-title">')|replace('\n', '<br>')|replace('</h4><br>', '</h4>')|safe }}
+
+                        <!-- 功能按钮 -->
+                        <div class="ai-actions">
+                            <button class="action-btn copy-btn" onclick="copyToClipboard(this)">
+                                <i class="icon">📋</i> 复制菜谱
+                            </button>
+                            <button class="action-btn regenerate-btn" onclick="document.getElementById('promptForm').submit()">
+                                <i class="icon">🔄</i> 重新生成
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- 错误提示 -->
+            {% if error %}
+            <div class="error-notice">
+                <i class="error-icon">⚠️</i>
+                <span class="error-text">{{ error }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 底部输入区域 -->
+    <div class="input-area">
+        <div class="input-container">
+            <form id="promptForm" method="POST" class="input-form">
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        name="keyword"
+                        placeholder="请输入你的需求..."
+                        value="{{ keyword if keyword else '' }}"
+                        class="prompt-input"
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit" class="send-btn" id="sendBtn">
+                        <i class="send-icon">→</i>
+                    </button>
+                </div>
+                <div class="input-hints">
+                    <span class="hint-item">示例：用虾仁做一道家常菜</span>
+                    <span class="hint-item">示例：低卡减脂餐推荐</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 复制到剪贴板功能
+        function copyToClipboard(button) {
+            const contentElement = button.closest('.ai-content');
+            const textToCopy = contentElement.innerText.trim();
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // 创建复制成功提示
+                const notification = document.createElement('div');
+                notification.className = 'copy-success';
+                notification.textContent = '已复制到剪贴板';
+                document.body.appendChild(notification);
+
+                // 显示提示
+                setTimeout(() => notification.classList.add('show'), 10);
+
+                // 3秒后隐藏并移除
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            });
+        }
+
+        // 表单提交时的加载状态
+        document.getElementById('promptForm').addEventListener('submit', function() {
+            const sendBtn = document.getElementById('sendBtn');
+            const originalContent = sendBtn.innerHTML;
+
+            // 显示加载状态
+            sendBtn.innerHTML = '<i class="send-icon">⟳</i>';
+            sendBtn.disabled = true;
+
+            // 3秒后恢复按钮状态
+            setTimeout(() => {
+                sendBtn.innerHTML = originalContent;
+                sendBtn.disabled = false;
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
+
+
+

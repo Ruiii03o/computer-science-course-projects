@@ -1,0 +1,58 @@
+# ------------------------------
+# IDE and editor local settings
+# ------------------------------
+**/.vs/
+**/.idea/
+**/.vscode/
+*.suo
+*.user
+*.vcxproj.user
+*.VC.db
+*.iml
+*.iws
+*.ipr
+
+# ------------------------------
+# C/C++ build outputs
+# ------------------------------
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/ipch/
+**/FlightBo.9c4cc922/
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.idb
+*.ipch
+*.tlog
+*.log
+*.recipe
+*.res
+*.FileListAbsolute.txt
+
+# ------------------------------
+# Java and Maven outputs
+# ------------------------------
+**/target/
+*.class
+
+# ------------------------------
+# Python environments and outputs
+# ------------------------------
+**/__pycache__/
+*.py[cod]
+**/.venv/
+**/build/
+**/dist/
+
+# ------------------------------
+# Local secrets and user-generated data
+# ------------------------------
+random-menu-generator/Recipe/config.py
+random-menu-generator/Recipe/messages.txt
+random-menu-generator/Recipe/data/messages.txt
+.env
+.env.*
